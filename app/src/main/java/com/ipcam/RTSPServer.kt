@@ -1,5 +1,6 @@
 package com.ipcam
 
+import android.os.Build
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
@@ -546,10 +547,14 @@ class RTSPServer(
             // These settings minimize encoder buffering and reduce latency
             try {
                 // Request low latency mode (Android 10+)
-                format.setInteger(MediaFormat.KEY_LATENCY, 0)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    format.setInteger(MediaFormat.KEY_LATENCY, 0)
+                }
                 
                 // Disable B-frames for lower latency (baseline profile doesn't use them anyway)
-                format.setInteger(MediaFormat.KEY_MAX_B_FRAMES, 0)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    format.setInteger(MediaFormat.KEY_MAX_B_FRAMES, 0)
+                }
                 
                 // Set real-time priority for encoding (Android 10+)
                 format.setInteger(MediaFormat.KEY_PRIORITY, 0) // 0 = realtime

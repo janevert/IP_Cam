@@ -20,7 +20,7 @@ IP_Cam transforms your Android phone or tablet into a fully-featured IP camera a
 ### Installation
 
 1. Download the latest APK from [Releases](https://github.com/tobi01001/IP_Cam/releases)
-2. Install on your Android device (Android 11+ required)
+2. Install on your Android device (Android 9+ required in this fork)
 3. Grant camera permissions when prompted
 
 ### Usage
@@ -174,7 +174,7 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 
 ## Requirements
 
-- **OS:** Android 11+ (API level 30+)
+- **OS:** Android 9+ (API level 28+)
 - **Permissions:** Camera, Internet
 - **Network:** WiFi connection
 
