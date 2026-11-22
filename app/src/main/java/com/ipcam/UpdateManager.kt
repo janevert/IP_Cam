@@ -124,6 +124,13 @@ class UpdateManager(private val context: Context) {
      * @return UpdateInfo object if check succeeds, null on error
      */
     suspend fun checkForUpdate(): UpdateInfo? = withContext(Dispatchers.IO) {
+        // API 28 build: upstream release APKs require Android 11+ and are signed with a
+        // different key, so OTA is disabled. Point GITHUB_API_URL at your own fork's
+        // releases and delete this early return if you want OTA back.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            Log.i(TAG, "OTA disabled on Android < 11 (upstream APKs are incompatible)")
+            return@withContext null
+        }
         try {
             Log.i(TAG, "Checking for updates...")
             

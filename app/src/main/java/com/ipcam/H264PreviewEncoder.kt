@@ -1,5 +1,6 @@
 package com.ipcam
 
+import android.os.Build
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
@@ -185,10 +186,14 @@ class H264PreviewEncoder(
                 // These settings minimize encoder buffering and reduce latency
                 try {
                     // Request low latency mode (Android 10+)
-                    setInteger(MediaFormat.KEY_LATENCY, 0)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        setInteger(MediaFormat.KEY_LATENCY, 0)
+                    }
                     
                     // Disable B-frames for lower latency (baseline profile doesn't use them anyway)
-                    setInteger(MediaFormat.KEY_MAX_B_FRAMES, 0)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        setInteger(MediaFormat.KEY_MAX_B_FRAMES, 0)
+                    }
                     
                     // Set real-time priority for encoding (Android 10+)
                     setInteger(MediaFormat.KEY_PRIORITY, 0) // 0 = realtime
@@ -234,7 +239,9 @@ class H264PreviewEncoder(
         try {
             val encoderInfo = encoder?.codecInfo
             val name = encoderInfo?.name ?: "unknown"
-            val isHardware = encoderInfo?.isHardwareAccelerated ?: false
+            val isHardware = if (encoderInfo == null) false
+            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) encoderInfo.isHardwareAccelerated
+            else !(name.startsWith("OMX.google.") || name.startsWith("c2.android.") || name.contains("sw", ignoreCase = true))
             
             Log.d(TAG, "Encoder: $name (Hardware: $isHardware)")
             Log.d(TAG, "Target resolution: ${width}x${height}, fps: $fps, bitrate: ${bitrate / 1_000_000.0}Mbps")
